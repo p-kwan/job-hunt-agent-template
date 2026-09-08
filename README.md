@@ -4,10 +4,15 @@ A personal job-hunt agent template, built to run inside Claude Code. The agent i
 
 ## Getting started
 
-1. Open this folder in Claude Code.
-2. Open [`job_search_profile.md`](job_search_profile.md) and ask Claude to interview you and fill it in — see [`CLAUDE.md`](CLAUDE.md) for the exact prompt pattern, or just say: "Open job_search_profile.md and ask me the questions needed to fill it in, then draft it based on my answers."
-3. (Optional) Give Claude a SearchAPI.io or SerpApi.com API key for real structured job search results — paste it directly in chat (e.g. "Here's my SerpAPI key: ...") and Claude will store it in `.env`, never in a tracked file.
-4. Paste the contents of [`weekly_run_prompt.md`](weekly_run_prompt.md) any time you want to run a search cycle.
+1. **Get this folder onto your laptop — pick ONE of these, not both:**
+   - **Download ZIP** (top of this repo page, under the green "Code" button) → unzip it. The unzipped folder is your project folder, done.
+   - **Or clone it** in Terminal: `git clone <this-repo-url>` — this creates the same folder for you, just via git instead of a zip.
+2. **Open that folder in Claude Code.** In Terminal: `cd` into the folder, then run `claude`.
+   - The first time Claude Code runs in a folder it hasn't seen before, it asks whether you trust the files in this workspace — say yes. This is Claude Code's own one-time permission check before it will read or edit anything there.
+   - If the folder lives inside Desktop, Documents, or Downloads, macOS may separately pop up its own "Terminal wants to access files in your ___ folder" dialog the first time — that's a normal macOS privacy prompt for Terminal itself, not something Claude is asking for. Click Allow/OK.
+3. Open [`job_search_profile.md`](job_search_profile.md) and ask Claude to interview you and fill it in — see [`CLAUDE.md`](CLAUDE.md) for the exact prompt pattern, or just say: "Open job_search_profile.md and ask me the questions needed to fill it in, then draft it based on my answers."
+4. (Optional) Give Claude a SearchAPI.io or SerpApi.com API key for real structured job search results — paste it directly in chat (e.g. "Here's my SerpAPI key: ...") and Claude will store it in `.env`, never in a tracked file.
+5. Paste the contents of [`weekly_run_prompt.md`](weekly_run_prompt.md) any time you want to run a search cycle.
 
 ## Saving progress back to GitHub (optional)
 
