@@ -1,0 +1,31 @@
+# Weekly Job Hunt Workflow
+
+Run when the user sends [weekly_run_prompt.md](weekly_run_prompt.md). Follow these steps in order.
+
+1. Read [job_search_profile.md](job_search_profile.md) in full.
+2. Read [job_leads.md](job_leads.md); record every existing (Company, Role) pair and its current OutreachStatus.
+3. Re-verify every existing lead whose OutreachStatus is `new` or `applied`: `WebFetch` its Link. Do this before searching for anything new — a stale link left marked `new` is worse than no lead at all. Leads already `passed`, `rejected`, `interviewing`, or `offer` don't need re-checking.
+   - **A dead link is not the same as a closed job.** If the Link is on an aggregator/mirror site (talentify.io, Built In, Glassdoor, LinkedIn, etc. — anywhere other than the company's own domain or its ATS, e.g. `*.myworkdayjobs.com`, `job-boards.greenhouse.io`, `jobs.<company>.com`) and it 404s/410s/redirects away, that only means *that specific mirror* is dead. Before marking it `passed`, re-search for the exact Role + Company (`WebSearch`) to check whether the original posting is still live elsewhere — on the company's own career site in particular. Only mark `passed` if that re-search also turns up nothing, or the company's own site explicitly shows it closed/filled.
+   - If the Link is already on the company's own domain/ATS and it's confirmed closed/filled/404 there, mark `passed` — that is a real signal.
+   - If `WebFetch` fails to render at all (empty content, JS-heavy page, blocked) rather than giving a clean closed/404/410 signal, that's inconclusive, not evidence of closure. **Never mark a lead `passed` on a blocked/inconclusive fetch — that call belongs to the user, not Claude.** Leave OutreachStatus unchanged, keep the row in the table, and append a dated note stating the fetch was blocked/inconclusive and the posting needs manual verification. The user marks it `passed` themselves once they've actually checked it (or tells Claude to, having verified it).
+   - When a re-search in the first bullet turns up the same posting live on the company's own site under a corrected title/URL, update the Link to that direct URL (replacing the aggregator link) and append a dated note explaining the correction, instead of just leaving the dead aggregator link in place.
+4. Search for new postings using `scripts/search_jobs.py` (queries the Google Jobs engine via SerpApi — structured, dated results) as the primary tool:
+   ```bash
+   set -a && source .env && set +a && python3 scripts/search_jobs.py "<query>" --location "<preferred location from profile>" --sources <mode from profile's Search sources section> --num 20
+   ```
+   Use the `--sources` mode set in `job_search_profile.md`'s "Search sources" section (default `quality` = company career pages + LinkedIn only). Build a few queries by combining the role, industry, and seniority terms from the profile (e.g. `"<role>" <industry>`, `"entry level <role>"`, `<role> rotational program <target year>`), and run at least one without a location filter to catch postings outside the preferred region. If the script errors (missing/invalid key, request failure), fall back to `WebSearch` for that query and note in the run summary that the API fallback was used.
+5. For each promising result, use `WebFetch` on its Link to confirm the posting is real, still open, and get the exact title/location — `search_jobs.py` results come from an aggregator (Google Jobs), so always verify the underlying posting rather than trusting the aggregator snippet alone. If the result's `via` is an aggregator/mirror rather than the company's own domain or ATS, do one extra `WebSearch` for the exact Role + Company to find and use the direct company-site link instead — store that as the Link, not the mirror, so re-verification in future runs (step 3) is checking the authoritative source. If `WebFetch` can't confirm a posting is live (blocked, redirects away, returns no content), **still add it to `job_leads.md`** — do not skip/drop it for that reason alone — with OutreachStatus `new` and an explicit "fetch blocked, unverified — confirm manually" note. Never present an unverified link as confirmed open, never present an unreachable aggregator mirror as proof the underlying job is closed, and never let a blocked fetch be the reason a lead doesn't make it into the log — only the user marks something `passed` on the basis of a fetch that couldn't be verified.
+6. Drop any posting that:
+   - Doesn't match the Availability/timing constraint in `job_search_profile.md` (hard filter if the profile says so explicitly, otherwise a judgment call — check what the profile says), or
+   - Doesn't match the position-type preference in the profile (e.g. internship vs. full-time), unless it's an unusually strong fit with no comparable alternative available, or
+   - Doesn't fit any target role or industry in the profile.
+   Keep borderline cases, but tag them with a one-line reason in MatchReason.
+7. Drop any posting already in `job_leads.md` (match on Company + Role) — do not re-add it.
+8. For each surviving new posting, add a row to the top of the `job_leads.md` table with: Source (where it was found, e.g. "LinkedIn", "Company careers page"), Role, Company, Location, Link, MatchReason (why it fits the profile, or the caveat from step 6), Notes (empty or a dated note, e.g. "found this run"), OutreachStatus `new`.
+9. If the user has mentioned progress on an existing lead in this conversation (applied, interview, rejected, offer), update that row's OutreachStatus and append a dated note to Notes (e.g. "applied"). If the lead isn't logged yet, add it with the reported OutreachStatus instead of `new`.
+10. Scan the full `job_leads.md` table and flag:
+    - `applied` leads whose Notes show no update in 2+ weeks,
+    - any `interviewing` leads,
+    - `new` leads untouched across multiple runs (no dated note added since they were first logged).
+11. Report to the user: new leads added, leads marked `passed` because they're no longer live (step 3), OutreachStatus updates applied, the flagged list from step 10, and any profile ambiguity hit while screening in step 6.
+12. Do not apply, message, or post anything on the user's behalf during this run. If the user asks to act on a lead, treat that as a separate request requiring its own explicit confirmation.
