@@ -9,6 +9,16 @@ A personal job-hunt agent template, built to run inside Claude Code. The agent i
 3. (Optional) Give Claude a SearchAPI.io or SerpApi.com API key for real structured job search results — paste it directly in chat (e.g. "Here's my SerpAPI key: ...") and Claude will store it in `.env`, never in a tracked file.
 4. Paste the contents of [`weekly_run_prompt.md`](weekly_run_prompt.md) any time you want to run a search cycle.
 
+## Saving progress back to GitHub (optional)
+
+Claude Code only edits the files on your laptop — it doesn't automatically sync anything to GitHub. If you cloned this from the template repo and want your changes (filled-in profile, saved leads, etc.) to actually show up on GitHub too, you need to **commit and push**, which requires the GitHub CLI installed and logged in on your machine:
+
+1. Download and install it: go to [github.com/cli/cli/releases/latest](https://github.com/cli/cli/releases/latest) and get the `.pkg` installer for your Mac, then double-click to install.
+2. In Terminal, run `gh auth login` and follow its prompts (GitHub.com → HTTPS → Yes → Login with a web browser).
+3. Back in Claude Code, just ask: **"commit and push my changes"** — do this any time you want your latest edits to appear on your GitHub repo page.
+
+This is a one-time setup per laptop. Until you do it, everything still works locally — you just won't see changes reflected on GitHub.
+
 ## Files
 
 - [`job_search_profile.md`](job_search_profile.md) — target roles, locations, industries, and constraints. The source of truth for what counts as a good lead. Starts blank — fill it in first.
